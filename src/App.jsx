@@ -20,7 +20,9 @@ import {
   ChevronRight,
   Terminal,
   FileText,
-  AlertCircle
+  AlertCircle,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import JSZip from 'jszip';
@@ -515,18 +517,102 @@ jobs:
                   </div>
                 </div>
 
-                <div className="input-group" style={{ marginTop: '12px' }}>
+                {/* Enhanced App Icon Section */}
+                <div className="input-group" style={{ marginTop: '16px' }}>
                   <label className="input-label">
-                    <ExternalLink size={16} color="var(--primary-light)" />
-                    URL Logo / Ikon APK (Square PNG)
+                    <ImageIcon size={16} color="var(--primary-light)" />
+                    Ikon Aplikasi (App Icon)
                   </label>
-                  <input
-                    type="text"
-                    className="input-field"
-                    placeholder="https://example.com/logo.png"
-                    value={appIcon}
-                    onChange={(e) => setAppIcon(e.target.value)}
-                  />
+                  
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '6px' }}>
+                    {/* Live Icon Thumbnail Preview */}
+                    <div style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '16px',
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '2px dashed var(--primary-light)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                      position: 'relative'
+                    }}>
+                      <img 
+                        src={appIcon} 
+                        alt="App Icon Preview" 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80'; }}
+                      />
+                    </div>
+
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {/* URL Field + File Upload Button */}
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <input
+                          type="text"
+                          className="input-field"
+                          placeholder="https://example.com/logo.png atau upload file"
+                          value={appIcon}
+                          onChange={(e) => setAppIcon(e.target.value)}
+                          style={{ flex: 1 }}
+                        />
+                        <label 
+                          className="btn btn-secondary"
+                          style={{ cursor: 'pointer', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+                        >
+                          <Upload size={16} />
+                          Upload
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (uploadEvent) => {
+                                  setAppIcon(uploadEvent.target.result);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+
+                      {/* Quick Presets */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Preset Ikon:</span>
+                        {[
+                          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
+                          'https://images.unsplash.com/photo-1614680376593-902f749f7edc?w=200&auto=format&fit=crop&q=80',
+                          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
+                          'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=200&auto=format&fit=crop&q=80'
+                        ].map((url, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setAppIcon(url)}
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '6px',
+                              border: appIcon === url ? '2px solid var(--primary-light)' : '1px solid var(--border-light)',
+                              padding: 0,
+                              overflow: 'hidden',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <img src={url} alt="preset" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="input-hint" style={{ marginTop: '6px' }}>Format disarankan: PNG / JPG Persegi (1:1), minimal 512x512px. Bisa upload langsung dari file lokal.</span>
                 </div>
 
                 {/* Quick Action Button */}
