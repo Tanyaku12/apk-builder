@@ -253,3 +253,49 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(20px);
 }
+
+/* Responsive Styles for Mobile & Tablet */
+@media (max-width: 1024px) {
+  .app-grid-container {
+    grid-template-columns: 1fr !important;
+  }
+  .device-preview-wrapper {
+    position: relative !important;
+    top: 0 !important;
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 12px 16px !important;
+  }
+
+  .nav-tabs-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    justify-content: flex-start !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px !important;
+  }
+
+  .nav-tabs-container button {
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
+    flex-shrink: 0;
+  }
+
+  .glass-panel {
+    padding: 18px !important;
+  }
+
+  .device-frame-mockup {
+    width: 280px !important;
+    height: 540px !important;
+  }
+
+  .grid-2col-responsive {
+    grid-template-columns: 1fr !important;
+  }
+}

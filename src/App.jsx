@@ -360,16 +360,20 @@ jobs:
       <main style={{ maxWidth: '1280px', margin: '32px auto 0', padding: '0 24px' }}>
         
         {/* Navigation Tabs */}
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          background: 'rgba(15, 23, 42, 0.6)',
-          padding: '6px',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-light)',
-          width: 'fit-content',
-          marginBottom: '28px'
-        }}>
+        <div 
+          className="nav-tabs-container"
+          style={{
+            display: 'flex',
+            gap: '8px',
+            background: 'rgba(15, 23, 42, 0.6)',
+            padding: '6px',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--border-light)',
+            width: 'fit-content',
+            marginBottom: '28px',
+            maxWidth: '100%'
+          }}
+        >
           {[
             { id: 'config', label: '1. Input & Konfigurasi', icon: Settings2 },
             { id: 'features', label: '2. Pengaturan APK & Fitur', icon: ShieldCheck },
@@ -405,12 +409,15 @@ jobs:
         </div>
 
         {/* Content Layout Grid */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: activeTab === 'config' ? '1fr 380px' : '1fr', 
-          gap: '32px', 
-          alignItems: 'start' 
-        }}>
+        <div 
+          className="app-grid-container"
+          style={{ 
+            display: 'grid', 
+            gridTemplateColumns: activeTab === 'config' ? '1fr 380px' : '1fr', 
+            gap: '32px', 
+            alignItems: 'start' 
+          }}
+        >
           
           {/* LEFT SIDE: Active Tab Content */}
           <div>
@@ -987,46 +994,29 @@ jobs:
                     Unduh file installer <code>.apk</code> langsung untuk aplikasi <strong>{appName}</strong>.
                   </p>
 
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <button 
                       className="btn btn-success"
                       onClick={downloadApkFile}
                       disabled={isBuildingApk || !isPackageValid || !isUrlValid}
                       style={{ 
-                        padding: '14px 28px', 
-                        fontSize: '1rem', 
+                        padding: '16px 36px', 
+                        fontSize: '1.05rem', 
                         fontWeight: '700',
+                        width: '100%',
+                        maxWidth: '400px',
                         boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)' 
                       }}
                     >
                       {isBuildingApk ? (
                         <>
-                          <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                          <RefreshCw size={20} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
                           Menyiapkan File APK...
                         </>
                       ) : (
                         <>
-                          <Download size={18} />
+                          <Download size={20} />
                           Download File APK (.APK)
-                        </>
-                      )}
-                    </button>
-
-                    <button 
-                      className="btn btn-secondary"
-                      onClick={downloadZipProject}
-                      disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
-                      style={{ padding: '14px 20px', fontSize: '0.9rem' }}
-                    >
-                      {isGeneratingZip ? (
-                        <>
-                          <RefreshCw size={16} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                          Membuat ZIP...
-                        </>
-                      ) : (
-                        <>
-                          <Download size={16} />
-                          Download Source (.ZIP)
                         </>
                       )}
                     </button>
