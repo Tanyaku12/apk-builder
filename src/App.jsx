@@ -1074,52 +1074,95 @@ jobs:
                     Klik tombol di bawah untuk langsung mengkompilasi file installer <code>.apk</code> bertanda tangan digital (Signed V1/V2 APK) untuk aplikasi <strong>{appName}</strong>.
                   </p>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', width: '100%' }}>
                     <button 
                       className="btn btn-success"
                       onClick={downloadApkFile}
                       disabled={isBuildingApk || !isPackageValid || !isUrlValid}
                       style={{ 
-                        padding: '16px 36px', 
-                        fontSize: '1.05rem', 
+                        padding: '14px 24px', 
+                        fontSize: '0.95rem', 
                         fontWeight: '700',
-                        width: '100%',
-                        maxWidth: '420px',
-                        boxShadow: '0 8px 30px rgba(16, 185, 129, 0.45)' 
+                        boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)' 
                       }}
                     >
                       {isBuildingApk ? (
                         <>
-                          <RefreshCw size={20} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                          Membangun & Menandatangani APK...
+                          <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                          Proses Build...
                         </>
                       ) : (
                         <>
-                          <Zap size={20} />
-                          Build & Download Signed APK (.APK)
+                          <Zap size={18} />
+                          Download APK Instan (.APK)
                         </>
                       )}
                     </button>
-                    
-                    {isBuildingApk && buildLogStatus && (
-                      <div style={{
-                        marginTop: '8px',
-                        padding: '8px 14px',
-                        borderRadius: '8px',
-                        background: 'rgba(6, 182, 212, 0.12)',
-                        border: '1px solid rgba(6, 182, 212, 0.3)',
-                        color: 'var(--accent-cyan)',
-                        fontSize: '0.8rem',
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: '600'
-                      }}>
-                        {buildLogStatus}
-                      </div>
-                    )}
 
-                    <span style={{ fontSize: '0.78rem', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
-                      <Check size={14} /> Direct Browser Compiler Engine Active
-                    </span>
+                    <button 
+                      className="btn btn-primary"
+                      onClick={downloadZipProject}
+                      disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
+                      style={{ padding: '14px 24px', fontSize: '0.95rem', fontWeight: '700' }}
+                    >
+                      {isGeneratingZip ? (
+                        <>
+                          <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                          Membuat ZIP...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={18} />
+                          Download Source Code Proyek (.ZIP)
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {isBuildingApk && buildLogStatus && (
+                    <div style={{
+                      marginTop: '12px',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      background: 'rgba(6, 182, 212, 0.12)',
+                      border: '1px solid rgba(6, 182, 212, 0.3)',
+                      color: 'var(--accent-cyan)',
+                      fontSize: '0.8rem',
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: '600'
+                    }}>
+                      {buildLogStatus}
+                    </div>
+                  )}
+                </div>
+
+                {/* Important Android OS Requirement Explanation */}
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '20px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <AlertCircle size={20} color="var(--accent-amber)" />
+                    <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--accent-amber)' }}>
+                      Mengapa Terjadi "Kesalahan Saat Mengurai Paket" di HP?
+                    </h4>
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '12px' }}>
+                    Sistem Android (*PackageInstaller*) menolak menginstall file `.apk` yang dibuat <strong>murni di dalam Browser Web tanpa Android NDK/SDK</strong> karena Android membutuhkan bytecode <code>classes.dex</code> yang dikompilasi oleh compiler <strong>javac / d8 / AAPT2</strong> serta kunci digital (*v2/v3 signing key*).
+                  </p>
+                  
+                  <div style={{ background: 'rgba(15, 23, 42, 0.7)', padding: '14px 16px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
+                    <h5 style={{ fontSize: '0.88rem', fontWeight: '700', color: '#fff', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Zap size={15} color="var(--primary-light)" /> Solusi Agar APK 100% Bisa Diinstall di Semua HP:
+                    </h5>
+                    <ol style={{ paddingLeft: '20px', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.7' }}>
+                      <li>Klik tombol <strong>Download Source Code Proyek (.ZIP)</strong> di atas.</li>
+                      <li>Upload file ZIP/Repository tersebut ke <strong>GitHub</strong> Anda.</li>
+                      <li>Fitur <strong>GitHub Actions</strong> (file <code>build-apk.yml</code> yang kami buatkan) akan otomatis berjalan di cloud secara gratis untuk mengompilasi file <strong>.APK resmi bertanda tangan</strong> yang siap di-install di HP manapun!</li>
+                    </ol>
                   </div>
                 </div>
 
