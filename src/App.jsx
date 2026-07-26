@@ -1038,29 +1038,46 @@ jobs:
                     Unduh file installer <code>.apk</code> langsung untuk aplikasi <strong>{appName}</strong>.
                   </p>
 
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
                     <button 
                       className="btn btn-success"
                       onClick={downloadApkFile}
                       disabled={isBuildingApk || !isPackageValid || !isUrlValid}
                       style={{ 
-                        padding: '16px 36px', 
-                        fontSize: '1.05rem', 
+                        padding: '14px 28px', 
+                        fontSize: '1rem', 
                         fontWeight: '700',
-                        width: '100%',
-                        maxWidth: '400px',
                         boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)' 
                       }}
                     >
                       {isBuildingApk ? (
                         <>
-                          <RefreshCw size={20} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                          <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
                           Menyiapkan File APK...
                         </>
                       ) : (
                         <>
-                          <Download size={20} />
+                          <Download size={18} />
                           Download File APK (.APK)
+                        </>
+                      )}
+                    </button>
+
+                    <button 
+                      className="btn btn-secondary"
+                      onClick={downloadZipProject}
+                      disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
+                      style={{ padding: '14px 22px', fontSize: '0.9rem' }}
+                    >
+                      {isGeneratingZip ? (
+                        <>
+                          <RefreshCw size={16} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                          Membuat ZIP...
+                        </>
+                      ) : (
+                        <>
+                          <Download size={16} />
+                          Download Proyek Source (.ZIP)
                         </>
                       )}
                     </button>
@@ -1072,14 +1089,15 @@ jobs:
                   background: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid var(--border-light)',
                   borderRadius: 'var(--radius-md)',
-                  padding: '20px'
+                  padding: '20px',
+                  marginBottom: '16px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                     <ShieldCheck size={18} color="var(--accent-green)" />
                     <h4 style={{ fontSize: '0.95rem', fontWeight: '700' }}>Dukungan Arsitektur Native (.APK):</h4>
                   </div>
                   <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                    File `.apk` yang dibuat sudah dilengkapi pustaka native (Native ABI Binaries) sehingga dapat langsung diinstall di berbagai perangkat Android:
+                    File `.apk` yang dibuat sudah dilengkapi pustaka native (Native ABI Binaries) untuk Android:
                   </p>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {['arm64-v8a (Android 64-bit modern)', 'armeabi-v7a (Android 32-bit legacy)', 'x86_64 (Emulator & ChromeOS)', 'x86 (Intel/AMD)'].map((abi, idx) => (
@@ -1095,6 +1113,25 @@ jobs:
                         ✓ {abi}
                       </span>
                     ))}
+                  </div>
+                </div>
+
+                {/* Info Card: Mengapa Terjadi Error Mengurai Paket */}
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '18px 20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <AlertCircle size={18} color="var(--accent-amber)" />
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-amber)' }}>Solusi "Terjadi Kesalahan Saat Mengurai Paket":</h4>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                    Pesan <em>"Parse Error"</em> pada Android terjadi karena installer APK membutuhkan <strong>Tanda Tangan Kunci (APK Signature V2/V3)</strong> & kompilasi bytecode <code>.dex</code> asli oleh Android SDK Build-Tools.
+                  </p>
+                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', fontSize: '0.8rem', color: '#e2e8f0', lineHeight: '1.6' }}>
+                    <strong>Saran Pemasangan:</strong> Unduh file <strong>Proyek Source (.ZIP)</strong> lalu upload ke <strong>GitHub Actions</strong> atau jalankan <code>cordova build android</code> di terminal untuk menghasilkan file APK yang ditandatangani resmi oleh Android SDK.
                   </div>
                 </div>
               </div>
