@@ -1148,15 +1148,15 @@ jobs:
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Zap size={20} color="var(--primary-light)" />
                       <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#fff' }}>
-                        Automatic Cloud APK Compiler Active
+                        Otomatisasi Sistem Cloud Builder (`build-apk.yml`)
                       </h4>
                     </div>
                     <span style={{ fontSize: '0.75rem', background: 'var(--accent-green)', color: '#fff', padding: '3px 8px', borderRadius: '12px', fontWeight: '700' }}>
-                      ACTIVE
+                      AUTOMATIC SYSTEM
                     </span>
                   </div>
                   <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '14px' }}>
-                    Sistem otomatisasi <strong>GitHub Actions Workflow (`build-apk.yml`)</strong> telah dikonfigurasi pada repository ini. Setiap perubahan pada web secara otomatis dicompile di cloud runner Android SDK resmi untuk menghasilkan file <code>.APK</code> bertanda tangan asli.
+                    Workflow <code>build-apk.yml</code> sepenuhnya <strong>dijalankan otomatis oleh sistem backend / cloud</strong> saat aplikasi dibuat. Pengguna (client) tidak perlu menjalankan terminal atau kompilasi manual—sistem otomatis memproses dan memberikan file <code>.APK</code> bertanda tangan digital yang siap langsung diinstall.
                   </p>
                   
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -1168,7 +1168,7 @@ jobs:
                       style={{ padding: '8px 16px', fontSize: '0.82rem', textDecoration: 'none' }}
                     >
                       <ExternalLink size={14} />
-                      Buka GitHub Actions Build Output
+                      Lihat Hasil Status Build Sistem (.APK)
                     </a>
                   </div>
                 </div>
