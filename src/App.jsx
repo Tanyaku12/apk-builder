@@ -53,6 +53,12 @@ export default function App() {
   const [enableJavaScript, setEnableJavaScript] = useState(true);
   const [hideStatusBar, setHideStatusBar] = useState(false);
 
+  // Native ABI Architecture Switches
+  const [includeArm64, setIncludeArm64] = useState(true);
+  const [includeArmv7, setIncludeArmv7] = useState(true);
+  const [includeX86_64, setIncludeX86_64] = useState(true);
+  const [includeX86, setIncludeX86] = useState(true);
+
   // App UI State
   const [activeTab, setActiveTab] = useState('config'); // config, preview, code, build
   const [copiedField, setCopiedField] = useState(null);
@@ -290,14 +296,14 @@ jobs:
       const assetsFolder = zip.folder("assets/www");
       assetsFolder.file("index.html", `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>${appName}</title></head><body style="margin:0;padding:0;overflow:hidden;"><iframe src="${backendUrl}" style="width:100vw;height:100vh;border:none;"></iframe></body></html>`);
 
-      // 4. Native ABI Libraries (arm64-v8a, armeabi-v7a, x86_64, x86) for Device Compatibility
+      // 4. Native ABI Libraries Dynamically Injected based on User Selection
       const elfHeader64 = new Uint8Array([0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
       const elfHeader32 = new Uint8Array([0x7f, 0x45, 0x4c, 0x46, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 
-      zip.folder("lib/arm64-v8a").file("libwrapper.so", elfHeader64);
-      zip.folder("lib/armeabi-v7a").file("libwrapper.so", elfHeader32);
-      zip.folder("lib/x86_64").file("libwrapper.so", elfHeader64);
-      zip.folder("lib/x86").file("libwrapper.so", elfHeader32);
+      if (includeArm64) zip.folder("lib/arm64-v8a").file("libwrapper.so", elfHeader64);
+      if (includeArmv7) zip.folder("lib/armeabi-v7a").file("libwrapper.so", elfHeader32);
+      if (includeX86_64) zip.folder("lib/x86_64").file("libwrapper.so", elfHeader64);
+      if (includeX86) zip.folder("lib/x86").file("libwrapper.so", elfHeader32);
 
       await new Promise(r => setTimeout(r, 600));
       setBuildLogStatus('3/4 Menandatangani sertifikat digital V1/V2 (apksigner)...');
@@ -1011,6 +1017,63 @@ jobs:
                       />
                       <span className="slider"></span>
                     </label>
+                  </div>
+                </div>
+
+                {/* Section: Arsitektur Pustaka Native (Native ABI Libraries) */}
+                <div style={{ marginTop: '32px' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: '700', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <ShieldCheck size={18} color="var(--primary-light)" />
+                    Arsitektur Pustaka Native (Native ABI Libraries)
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                    Pilih arsitektur CPU HP Android yang ingin didukung di dalam paket installer APK:
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                    <div className="toggle-row" style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.02)' }}>
+                      <div className="toggle-info">
+                        <span className="toggle-title" style={{ fontSize: '0.88rem' }}>arm64-v8a</span>
+                        <span className="toggle-desc">Android 64-bit modern (HP keluaran baru)</span>
+                      </div>
+                      <label className="switch">
+                        <input type="checkbox" checked={includeArm64} onChange={(e) => setIncludeArm64(e.target.checked)} />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    <div className="toggle-row" style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.02)' }}>
+                      <div className="toggle-info">
+                        <span className="toggle-title" style={{ fontSize: '0.88rem' }}>armeabi-v7a</span>
+                        <span className="toggle-desc">Android 32-bit legacy (HP lama)</span>
+                      </div>
+                      <label className="switch">
+                        <input type="checkbox" checked={includeArmv7} onChange={(e) => setIncludeArmv7(e.target.checked)} />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    <div className="toggle-row" style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.02)' }}>
+                      <div className="toggle-info">
+                        <span className="toggle-title" style={{ fontSize: '0.88rem' }}>x86_64</span>
+                        <span className="toggle-desc">Emulator PC 64-bit & ChromeOS</span>
+                      </div>
+                      <label className="switch">
+                        <input type="checkbox" checked={includeX86_64} onChange={(e) => setIncludeX86_64(e.target.checked)} />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+
+                    <div className="toggle-row" style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.02)' }}>
+                      <div className="toggle-info">
+                        <span className="toggle-title" style={{ fontSize: '0.88rem' }}>x86</span>
+                        <span className="toggle-desc">Emulator Intel/AMD 32-bit</span>
+                      </div>
+                      <label className="switch">
+                        <input type="checkbox" checked={includeX86} onChange={(e) => setIncludeX86(e.target.checked)} />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
                   </div>
                 </div>
 
