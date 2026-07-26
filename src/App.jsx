@@ -320,25 +320,6 @@ jobs:
               <Smartphone size={16} />
               {activeTab === 'preview' ? 'Tutup Preview' : 'Live Phone Preview'}
             </button>
-
-            <button 
-              className="btn btn-primary"
-              onClick={downloadZipProject}
-              disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
-              style={{ opacity: (!isPackageValid || !isUrlValid) ? 0.6 : 1 }}
-            >
-              {isGeneratingZip ? (
-                <>
-                  <RefreshCw size={16} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                  Membuat ZIP...
-                </>
-              ) : (
-                <>
-                  <Download size={16} />
-                  Download Source Code (.ZIP)
-                </>
-              )}
-            </button>
           </div>
         </div>
       </header>
