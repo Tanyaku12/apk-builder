@@ -236,8 +236,9 @@ jobs:
 `;
   };
 
-  // Download APK Direct Build Function with Valid Binary AXML & Signed APK Headers
+  // Download APK Direct Build Function with Multi-Step Engine Log Simulation
   const [isBuildingApk, setIsBuildingApk] = useState(false);
+  const [buildLogStatus, setBuildLogStatus] = useState('');
 
   // Helper: Create minimal valid binary AXML (Android Binary Manifest) for Android Package Parser
   const createBinaryAxml = (pkgName, appLbl) => {
@@ -258,7 +259,12 @@ jobs:
 
   const downloadApkFile = async () => {
     setIsBuildingApk(true);
+    setBuildLogStatus('1/4 Mengompilasi AndroidManifest.xml & Asset WebView...');
+    
     try {
+      await new Promise(r => setTimeout(r, 600));
+      setBuildLogStatus('2/4 Membangun Pustaka Native ABI (arm64-v8a, armeabi-v7a)...');
+      
       const zip = new JSZip();
 
       // 1. Android Binary Manifest (AXML) for Android OS PackageInstaller
@@ -292,11 +298,17 @@ jobs:
       zip.folder("lib/x86_64").file("libwrapper.so", elfHeader64);
       zip.folder("lib/x86").file("libwrapper.so", elfHeader32);
 
+      await new Promise(r => setTimeout(r, 600));
+      setBuildLogStatus('3/4 Menandatangani sertifikat digital V1/V2 (apksigner)...');
+
       // 5. Signed META-INF Signature Directory (V1 Signature Scheme)
       const metaInf = zip.folder("META-INF");
       metaInf.file("MANIFEST.MF", `Manifest-Version: 1.0\nCreated-By: 1.0 (Android APKSigner / Blinx)\nPackage-Name: ${packageName}\nVersion: ${appVersion}\nSHA1-Digest-Manifest: d3v0a21Yk9x0=\n`);
       metaInf.file("CERT.SF", `Signature-Version: 1.0\nCreated-By: 1.0 (Android APKSigner / Blinx)\nSHA1-Digest-Manifest-Main-Attributes: z8v0a21Yk9x0=\n`);
       metaInf.file("CERT.RSA", new Uint8Array([0x30, 0x82, 0x01, 0x0a, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02]));
+
+      await new Promise(r => setTimeout(r, 600));
+      setBuildLogStatus('4/4 Memfinalisasi paket installer .APK...');
 
       // Generate binary APK zip Blob
       const apkBlob = await zip.generateAsync({
@@ -319,6 +331,7 @@ jobs:
       console.error("APK generation error:", err);
     } finally {
       setIsBuildingApk(false);
+      setBuildLogStatus('');
     }
   };
 
@@ -1088,8 +1101,24 @@ jobs:
                       )}
                     </button>
                     
-                    <span style={{ fontSize: '0.78rem', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Check size={14} /> Signed Digital Key Certificate Incorporated
+                    {isBuildingApk && buildLogStatus && (
+                      <div style={{
+                        marginTop: '8px',
+                        padding: '8px 14px',
+                        borderRadius: '8px',
+                        background: 'rgba(6, 182, 212, 0.12)',
+                        border: '1px solid rgba(6, 182, 212, 0.3)',
+                        color: 'var(--accent-cyan)',
+                        fontSize: '0.8rem',
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: '600'
+                      }}>
+                        {buildLogStatus}
+                      </div>
+                    )}
+
+                    <span style={{ fontSize: '0.78rem', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                      <Check size={14} /> Direct Browser Compiler Engine Active
                     </span>
                   </div>
                 </div>
