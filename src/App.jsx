@@ -850,184 +850,245 @@ jobs:
             )}
           </div>
 
-          {/* RIGHT SIDE: Interactive Phone Simulator Mockup */}
-          <div>
-            <div style={{
-              position: 'sticky',
-              top: '100px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-                marginBottom: '12px'
-              }}>
-                <span style={{ fontSize: '0.88rem', fontWeight: '700', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Smartphone size={16} /> Live App Preview
-                </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-green)' }}></span>
-                  WebView Interactive
-                </span>
-              </div>
-
-              {/* Realistic Smartphone Mockup Frame */}
-              <div style={{
-                width: '320px',
-                height: '620px',
-                background: '#090a0f',
-                borderRadius: '40px',
-                border: `8px solid ${themeColor}`,
-                boxShadow: `0 20px 50px rgba(0,0,0,0.8), 0 0 30px ${themeColor}40`,
-                display: 'flex',
-                flexDirection: 'column',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                
-                {/* Speaker & Camera Notch */}
+              {/* RIGHT SIDE: Interactive Device Simulator Mockup */}
+              <div>
                 <div style={{
-                  position: 'absolute',
-                  top: '0',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '120px',
-                  height: '24px',
-                  background: themeColor,
-                  borderBottomLeftRadius: '14px',
-                  borderBottomRightRadius: '14px',
-                  zIndex: 20,
+                  position: 'sticky',
+                  top: '100px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
+                  flexDirection: 'column',
+                  alignItems: 'center'
                 }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#000' }}></div>
-                  <div style={{ width: '35px', height: '4px', borderRadius: '2px', background: 'rgba(0,0,0,0.5)' }}></div>
-                </div>
-
-                {/* Status Bar */}
-                {!hideStatusBar && (
+                  {/* Header & Controls */}
                   <div style={{
-                    height: '32px',
-                    background: 'rgba(0,0,0,0.8)',
-                    padding: '8px 18px 0',
                     display: 'flex',
-                    justify: 'space-between',
                     alignItems: 'center',
-                    fontSize: '0.7rem',
-                    fontWeight: '600',
-                    color: '#fff',
-                    zIndex: 10
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    marginBottom: '12px'
                   }}>
-                    <span>15:40</span>
-                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                      <span>5G</span>
-                      <div style={{ width: '16px', height: '8px', border: '1px solid #fff', borderRadius: '2px', padding: '1px' }}>
-                        <div style={{ width: '70%', height: '100%', background: '#fff' }}></div>
-                      </div>
+                    <span style={{ fontSize: '0.88rem', fontWeight: '700', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Smartphone size={16} /> Live Device Preview
+                    </span>
+                    
+                    {/* Device Selector Controls */}
+                    <div style={{ display: 'flex', gap: '4px', background: 'rgba(15, 23, 42, 0.8)', padding: '3px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                      <button
+                        onClick={() => setPreviewDevice('android')}
+                        style={{
+                          background: previewDevice === 'android' ? 'var(--primary)' : 'transparent',
+                          color: previewDevice === 'android' ? '#fff' : 'var(--text-muted)',
+                          border: 'none',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          cursor: 'pointer',
+                          fontWeight: '600'
+                        }}
+                        title="Smartphone View"
+                      >
+                        Phone
+                      </button>
+                      <button
+                        onClick={() => setPreviewDevice('tablet')}
+                        style={{
+                          background: previewDevice === 'tablet' ? 'var(--primary)' : 'transparent',
+                          color: previewDevice === 'tablet' ? '#fff' : 'var(--text-muted)',
+                          border: 'none',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          cursor: 'pointer',
+                          fontWeight: '600'
+                        }}
+                        title="Tablet View"
+                      >
+                        Tablet
+                      </button>
                     </div>
                   </div>
-                )}
 
-                {/* App Bar / Header inside phone */}
-                <div style={{
-                  background: themeColor,
-                  padding: hideStatusBar ? '32px 14px 10px' : '10px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  color: '#fff',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <img 
-                      src={appIcon} 
-                      alt="Icon" 
-                      style={{ width: '26px', height: '26px', borderRadius: '6px', objectFit: 'cover' }}
-                      onError={(e) => { e.target.src = 'https://via.placeholder.com/50'; }}
-                    />
-                    <span style={{ fontSize: '0.9rem', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '160px' }}>
-                      {appName || 'Nama Aplikasi'}
-                    </span>
-                  </div>
-                  <a 
-                    href={backendUrl} 
-                    target="_blank" 
-                    rel="noreferrer"
-                    style={{ color: '#fff', display: 'flex', opacity: 0.8 }}
-                  >
-                    <ExternalLink size={14} />
-                  </a>
-                </div>
-
-                {/* Simulated WebView Iframe */}
-                <div style={{ flex: 1, background: '#fff', position: 'relative' }}>
-                  {isUrlValid ? (
-                    <iframe
-                      src={backendUrl}
-                      title="APK Preview"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        border: 'none'
-                      }}
-                      onError={() => setSimulatedUrl('')}
-                    />
-                  ) : (
+                  {/* Device Frame */}
+                  <div style={{
+                    width: previewDevice === 'tablet' ? '360px' : '320px',
+                    height: previewDevice === 'tablet' ? '540px' : '620px',
+                    background: '#090a0f',
+                    borderRadius: previewDevice === 'tablet' ? '28px' : '40px',
+                    border: `8px solid ${themeColor}`,
+                    boxShadow: `0 20px 50px rgba(0,0,0,0.8), 0 0 30px ${themeColor}40`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}>
+                    
+                    {/* Speaker & Camera Notch */}
                     <div style={{
-                      height: '100%',
+                      position: 'absolute',
+                      top: '0',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: previewDevice === 'tablet' ? '80px' : '120px',
+                      height: '22px',
+                      background: themeColor,
+                      borderBottomLeftRadius: '14px',
+                      borderBottomRightRadius: '14px',
+                      zIndex: 20,
                       display: 'flex',
-                      flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      padding: '20px',
-                      textAlign: 'center',
-                      color: '#64748b'
+                      gap: '8px'
                     }}>
-                      <AlertCircle size={36} color="var(--accent-amber)" />
-                      <p style={{ fontSize: '0.85rem', marginTop: '10px' }}>
-                        Masukkan URL Website backend yang valid untuk melihat previewWebView.
-                      </p>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#000' }}></div>
+                      {previewDevice !== 'tablet' && (
+                        <div style={{ width: '35px', height: '4px', borderRadius: '2px', background: 'rgba(0,0,0,0.5)' }}></div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Android Bottom Navigation Bar */}
-                <div style={{
-                  height: '34px',
-                  background: '#000',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-around'
-                }}>
-                  <div style={{ width: '12px', height: '12px', borderLeft: '2px solid #aaa', borderBottom: '2px solid #aaa', transform: 'rotate(45deg)' }}></div>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid #aaa' }}></div>
-                  <div style={{ width: '12px', height: '12px', border: '2px solid #aaa', borderRadius: '2px' }}></div>
+                    {/* Status Bar */}
+                    {!hideStatusBar && (
+                      <div style={{
+                        height: '32px',
+                        background: 'rgba(0,0,0,0.8)',
+                        padding: '8px 18px 0',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        fontSize: '0.7rem',
+                        fontWeight: '600',
+                        color: '#fff',
+                        zIndex: 10
+                      }}>
+                        <span>15:40</span>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <span>5G</span>
+                          <div style={{ width: '16px', height: '8px', border: '1px solid #fff', borderRadius: '2px', padding: '1px' }}>
+                            <div style={{ width: '70%', height: '100%', background: '#fff' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* App Bar / Header inside phone */}
+                    <div style={{
+                      background: themeColor,
+                      padding: hideStatusBar ? '32px 14px 10px' : '10px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      color: '#fff',
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img 
+                          src={appIcon} 
+                          alt="Icon" 
+                          style={{ width: '26px', height: '26px', borderRadius: '6px', objectFit: 'cover' }}
+                          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80'; }}
+                        />
+                        <span style={{ fontSize: '0.9rem', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: previewDevice === 'tablet' ? '200px' : '160px' }}>
+                          {appName || 'Nama Aplikasi'}
+                        </span>
+                      </div>
+                      <a 
+                        href={backendUrl} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        style={{ color: '#fff', display: 'flex', opacity: 0.8 }}
+                        title="Buka Website di Tab Baru"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    </div>
+
+                    {/* Simulated WebView Content */}
+                    <div style={{ flex: 1, background: '#fff', position: 'relative', overflow: 'hidden' }}>
+                      {isUrlValid ? (
+                        <iframe
+                          src={backendUrl}
+                          title="APK Preview"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            border: 'none'
+                          }}
+                          onError={() => setSimulatedUrl('')}
+                        />
+                      ) : (
+                        <div style={{
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '24px',
+                          textAlign: 'center',
+                          color: '#475569',
+                          background: '#f8fafc'
+                        }}>
+                          <div style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '50%',
+                            background: '#fee2e2',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: '12px'
+                          }}>
+                            <AlertCircle size={28} color="#ef4444" />
+                          </div>
+                          <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#1e293b', marginBottom: '4px' }}>
+                            URL Tidak Valid
+                          </h4>
+                          <p style={{ fontSize: '0.8rem', color: '#64748b', lineHeight: '1.4' }}>
+                            Masukkan URL Website backend yang valid (dimulai dengan http:// atau https://) untuk melihat preview WebView.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Android Bottom Navigation Bar */}
+                    <div style={{
+                      height: '34px',
+                      background: '#000',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-around'
+                    }}>
+                      <div style={{ width: '12px', height: '12px', borderLeft: '2px solid #aaa', borderBottom: '2px solid #aaa', transform: 'rotate(45deg)' }}></div>
+                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid #aaa' }}></div>
+                      <div style={{ width: '12px', height: '12px', border: '2px solid #aaa', borderRadius: '2px' }}></div>
+                    </div>
+                  </div>
+
+                  {/* Package & Info Badge Summary */}
+                  <div style={{
+                    marginTop: '16px',
+                    width: '100%',
+                    background: 'rgba(15, 23, 42, 0.7)',
+                    padding: '12px 16px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-light)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    textAlign: 'center'
+                  }}>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>TARGET PACKAGE & VERSI</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                      <code style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)', fontFamily: 'var(--font-mono)' }}>
+                        {packageName || 'builder.apk.blinx'}
+                      </code>
+                      <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.1)', padding: '1px 6px', borderRadius: '4px' }}>
+                        v{appVersion}
+                      </span>
+                    </div>
+                  </div>
+
                 </div>
               </div>
-
-              {/* Package Badge Summary */}
-              <div style={{
-                marginTop: '16px',
-                background: 'rgba(15, 23, 42, 0.7)',
-                padding: '10px 16px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-light)',
-                textAlign: 'center'
-              }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'block' }}>TARGET PACKAGE</span>
-                <code style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)', fontFamily: 'var(--font-mono)' }}>
-                  {packageName || 'builder.apk.blinx'}
-                </code>
-              </div>
-
-            </div>
-          </div>
 
         </div>
       </main>
