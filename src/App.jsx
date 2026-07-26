@@ -1075,39 +1075,29 @@ jobs:
                     Klik tombol di bawah untuk langsung mengkompilasi file installer <code>.apk</code> bertanda tangan digital (Signed V1/V2 APK) untuk aplikasi <strong>{appName}</strong>.
                   </p>
 
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', width: '100%' }}>
-                    <a
-                      href="https://github.com/Tanyaku12/apk-builder/actions"
-                      target="_blank"
-                      rel="noreferrer"
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button 
                       className="btn btn-success"
+                      onClick={downloadApkFile}
+                      disabled={isBuildingApk || !isPackageValid || !isUrlValid}
                       style={{ 
-                        padding: '14px 28px', 
-                        fontSize: '1rem', 
+                        padding: '16px 36px', 
+                        fontSize: '1.05rem', 
                         fontWeight: '700',
-                        textDecoration: 'none',
-                        boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)' 
+                        width: '100%',
+                        maxWidth: '420px',
+                        boxShadow: '0 8px 30px rgba(16, 185, 129, 0.45)' 
                       }}
                     >
-                      <Download size={20} />
-                      Download Release Signed APK (.APK)
-                    </a>
-
-                    <button 
-                      className="btn btn-secondary"
-                      onClick={downloadZipProject}
-                      disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
-                      style={{ padding: '14px 24px', fontSize: '0.95rem', fontWeight: '700' }}
-                    >
-                      {isGeneratingZip ? (
+                      {isBuildingApk ? (
                         <>
-                          <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                          Membuat ZIP...
+                          <RefreshCw size={20} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                          Menyiapkan File APK...
                         </>
                       ) : (
                         <>
-                          <Download size={18} />
-                          Download Source Code Proyek (.ZIP)
+                          <Download size={20} />
+                          Download File APK (.APK)
                         </>
                       )}
                     </button>
