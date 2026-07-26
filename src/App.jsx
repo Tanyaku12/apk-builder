@@ -349,7 +349,7 @@ jobs:
             { id: 'config', label: '1. Input & Konfigurasi', icon: Settings2 },
             { id: 'features', label: '2. Pengaturan APK & Fitur', icon: ShieldCheck },
             { id: 'code', label: '3. Source Code Manifest', icon: Code2 },
-            { id: 'build', label: '4. Panduan Build APK', icon: Terminal }
+            { id: 'build', label: '4. Download APK & Source Code', icon: Download }
           ].map(tab => {
             const IconComponent = tab.icon;
             const isActive = activeTab === tab.id;
@@ -973,76 +973,97 @@ jobs:
                     className="btn btn-primary"
                     onClick={() => setActiveTab('build')}
                   >
-                    Lihat Panduan Build APK
+                    Lanjut ke Download APK
                     <ChevronRight size={18} />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* TAB 4: Build Instructions & GitHub Action Guide */}
+            {/* TAB 4: Download APK & Source Code */}
             {activeTab === 'build' && (
               <div className="glass-panel" style={{ padding: '28px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                  <Terminal color="var(--accent-pink)" size={22} />
+                  <Download color="var(--accent-green)" size={24} />
                   <div>
-                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Cara Compile Jadi File APK (.apk)</h2>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Download APK & Source Code Proyek</h2>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      Pilih metode berikut untuk mengubah source code menjadi file APK siap install.
+                      Unduh file proyek aplikasi Anda ({appName}) yang sudah dikonfigurasi dan siap dicompile.
                     </p>
                   </div>
                 </div>
 
-                {/* Option A: Github Actions */}
+                {/* Primary Download Action Card */}
                 <div style={{
-                  background: 'rgba(99, 102, 241, 0.08)',
-                  border: '1px solid rgba(99, 102, 241, 0.25)',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
                   borderRadius: 'var(--radius-md)',
-                  padding: '20px',
-                  marginBottom: '20px'
+                  padding: '24px',
+                  marginBottom: '24px',
+                  textAlign: 'center'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                    <Zap size={18} color="var(--primary-light)" />
-                    <h3 style={{ fontSize: '1rem', fontWeight: '700' }}>Metode 1: Build Otomatis di Cloud (Gratis Tanpa Laptop Canggih)</h3>
+                  <div style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    background: 'var(--accent-green)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)'
+                  }}>
+                    <Download size={28} color="#fff" />
                   </div>
-                  <ol style={{ paddingLeft: '20px', fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: '1.7' }}>
-                    <li>Unduh file proyek dengan mengklik tombol <strong>Download Source Code (.ZIP)</strong>.</li>
-                    <li>Ekstrak dan Upload repository ke <strong>GitHub</strong> Anda.</li>
-                    <li>Masuk ke tab <strong>Actions</strong> di GitHub repository Anda.</li>
-                    <li>Workflow <code>Build Android APK</code> akan otomatis berjalan dan menghasilkan file <strong>app-debug.apk</strong> siap diunduh!</li>
-                  </ol>
+
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '8px' }}>
+                    File Proyek Siap Diunduh!
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '500px', margin: '0 auto 20px', lineHeight: '1.5' }}>
+                    Unduh paket <code>.ZIP</code> berisi seluruh file konfigurasi native Android, <strong>AndroidManifest.xml</strong>, ikon aplikasi, dan kode WebView.
+                  </p>
+
+                  <button 
+                    className="btn btn-success"
+                    onClick={downloadZipProject}
+                    disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
+                    style={{ 
+                      padding: '14px 28px', 
+                      fontSize: '1rem', 
+                      fontWeight: '700',
+                      boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)' 
+                    }}
+                  >
+                    {isGeneratingZip ? (
+                      <>
+                        <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                        Membuat File ZIP...
+                      </>
+                    ) : (
+                      <>
+                        <Download size={18} />
+                        Download File Proyek (.ZIP)
+                      </>
+                    )}
+                  </button>
                 </div>
 
-                {/* Option B: Local Android Studio / Cordova */}
+                {/* Build Guide Accordion */}
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid var(--border-light)',
                   borderRadius: 'var(--radius-md)',
                   padding: '20px'
                 }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '12px' }}>Metode 2: Build di Computer / Android Studio</h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                    Jalankan perintah berikut pada terminal laptop Anda dengan Cordova CLI / Ionic:
-                  </p>
-                  <div style={{ background: '#050811', padding: '14px', borderRadius: '8px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
-                    <div># 1. Install Cordova CLI global</div>
-                    <div style={{ color: '#fff' }}>npm install -g cordova</div>
-                    <br />
-                    <div># 2. Buat & jalankan build android</div>
-                    <div style={{ color: '#fff' }}>cordova platform add android</div>
-                    <div style={{ color: '#fff' }}>cordova build android --release</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <Zap size={18} color="var(--primary-light)" />
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: '700' }}>Langkah Compile Menjadi File APK (.apk):</h4>
                   </div>
-                </div>
-
-                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
-                  <button 
-                    className="btn btn-success"
-                    onClick={downloadZipProject}
-                    style={{ width: '100%', padding: '14px' }}
-                  >
-                    <Download size={18} />
-                    Download Project Zip ({appName})
-                  </button>
+                  <ol style={{ paddingLeft: '20px', fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.7' }}>
+                    <li>Klik tombol <strong>Download File Proyek (.ZIP)</strong> di atas.</li>
+                    <li>Ekstrak file `.zip` ke komputer Anda atau upload langsung ke <strong>GitHub Repository</strong>.</li>
+                    <li>Jalankan perintah <code>cordova build android --release</code> atau manfaatkan fitur <strong>GitHub Actions</strong> untuk compile otomatis file APK tanpa laptop canggih.</li>
+                  </ol>
                 </div>
               </div>
             )}
