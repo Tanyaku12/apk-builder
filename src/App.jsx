@@ -348,8 +348,7 @@ jobs:
           {[
             { id: 'config', label: '1. Input & Konfigurasi', icon: Settings2 },
             { id: 'features', label: '2. Pengaturan APK & Fitur', icon: ShieldCheck },
-            { id: 'code', label: '3. Source Code Manifest', icon: Code2 },
-            { id: 'build', label: '4. Download APK & Source Code', icon: Download }
+            { id: 'build', label: '3. Download APK', icon: Download }
           ].map(tab => {
             const IconComponent = tab.icon;
             const isActive = activeTab === tab.id;
@@ -911,66 +910,6 @@ jobs:
                   </button>
                   <button 
                     className="btn btn-primary"
-                    onClick={() => setActiveTab('code')}
-                  >
-                    Lihat Source Code Manifest
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: Generated Code Viewer */}
-            {activeTab === 'code' && (
-              <div className="glass-panel" style={{ padding: '28px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <Code2 color="var(--accent-cyan)" size={22} />
-                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Generated Native Files</h2>
-                  </div>
-                  <button 
-                    className="btn btn-secondary"
-                    onClick={() => handleCopy(getAndroidManifest(), 'manifest')}
-                    style={{ fontSize: '0.8rem', padding: '6px 12px' }}
-                  >
-                    {copiedField === 'manifest' ? <Check size={14} color="var(--accent-green)" /> : <Copy size={14} />}
-                    {copiedField === 'manifest' ? 'Tersalin!' : 'Salin Manifest'}
-                  </button>
-                </div>
-
-                {/* Code snippets tab / viewer */}
-                <div style={{ background: '#050811', borderRadius: 'var(--radius-md)', padding: '16px', overflowX: 'auto' }}>
-                  <div style={{ display: 'flex', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--primary-light)', fontWeight: '600', fontFamily: 'var(--font-mono)' }}>
-                      AndroidManifest.xml
-                    </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
-                      MainActivity.java
-                    </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
-                      config.xml
-                    </span>
-                  </div>
-                  <pre style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.82rem',
-                    color: '#e2e8f0',
-                    lineHeight: '1.5',
-                    margin: 0
-                  }}>
-                    {getAndroidManifest()}
-                  </pre>
-                </div>
-
-                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between' }}>
-                  <button 
-                    className="btn btn-secondary"
-                    onClick={() => setActiveTab('features')}
-                  >
-                    Kembali
-                  </button>
-                  <button 
-                    className="btn btn-primary"
                     onClick={() => setActiveTab('build')}
                   >
                     Lanjut ke Download APK
@@ -980,15 +919,15 @@ jobs:
               </div>
             )}
 
-            {/* TAB 4: Download APK & Source Code */}
+            {/* TAB 3: Download APK */}
             {activeTab === 'build' && (
               <div className="glass-panel" style={{ padding: '28px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
                   <Download color="var(--accent-green)" size={24} />
                   <div>
-                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Download APK & Source Code Proyek</h2>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Download APK Application</h2>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      Unduh file proyek aplikasi Anda ({appName}) yang sudah dikonfigurasi dan siap dicompile.
+                      Unduh file proyek aplikasi {appName} yang telah terkonfigurasi secara lengkap.
                     </p>
                   </div>
                 </div>
