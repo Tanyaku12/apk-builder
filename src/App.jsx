@@ -1,0 +1,1036 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Smartphone, 
+  Globe, 
+  Package, 
+  Download, 
+  Copy, 
+  Check, 
+  Sparkles, 
+  Settings2, 
+  ShieldCheck, 
+  Layers, 
+  Code2, 
+  Palette, 
+  RefreshCw, 
+  ExternalLink,
+  WifiOff,
+  Zap,
+  Info,
+  ChevronRight,
+  Terminal,
+  FileText,
+  AlertCircle
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
+import JSZip from 'jszip';
+
+export default function App() {
+  // Primary User Inputs (as requested)
+  const [appName, setAppName] = useState('Blinx Web App');
+  const [packageName, setPackageName] = useState('builder.apk.blinx');
+  const [backendUrl, setBackendUrl] = useState('https://blinx.app');
+
+  // Extended Customization State
+  const [appVersion, setAppVersion] = useState('1.0.0');
+  const [themeColor, setThemeColor] = useState('#6366f1');
+  const [orientation, setOrientation] = useState('portrait'); // portrait, landscape, auto
+  const [appIcon, setAppIcon] = useState('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80');
+
+  // Permissions & Features Switches
+  const [enableCamera, setEnableCamera] = useState(true);
+  const [enableLocation, setEnableLocation] = useState(false);
+  const [enablePushNotification, setEnablePushNotification] = useState(true);
+  const [enableOfflineCache, setEnableOfflineCache] = useState(true);
+  const [pullToRefresh, setPullToRefresh] = useState(true);
+  const [enableJavaScript, setEnableJavaScript] = useState(true);
+  const [hideStatusBar, setHideStatusBar] = useState(false);
+
+  // App UI State
+  const [activeTab, setActiveTab] = useState('config'); // config, preview, code, build
+  const [copiedField, setCopiedField] = useState(null);
+  const [isGeneratingZip, setIsGeneratingZip] = useState(false);
+  const [buildStep, setBuildStep] = useState(0);
+  const [simulatedUrl, setSimulatedUrl] = useState('');
+  const [previewDevice, setPreviewDevice] = useState('android'); // android, tablet
+
+  useEffect(() => {
+    setSimulatedUrl(backendUrl);
+  }, [backendUrl]);
+
+  // Validation functions
+  const isPackageValid = /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$/i.test(packageName);
+  const isUrlValid = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(backendUrl);
+
+  const handleCopy = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(key);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  };
+
+  // Generate Config XML for Cordova/PhoneGap/Capacitor
+  const getConfigXml = () => {
+    return `<?xml version='1.0' encoding='utf-8'?>
+<widget id="${packageName}" version="${appVersion}" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>${appName}</name>
+    <description>APK Wrapper untuk ${backendUrl}</description>
+    <author email="dev@${packageName}">Blinx APK Builder</author>
+    <content src="${backendUrl}" />
+    <access origin="*" />
+    <allow-navigation href="${backendUrl}/*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    
+    <preference name="Orientation" value="${orientation}" />
+    <preference name="BackgroundColor" value="${themeColor}" />
+    <preference name="Fullscreen" value="${hideStatusBar}" />
+    <preference name="DisallowOverscroll" value="${!pullToRefresh}" />
+    
+    <plugin name="cordova-plugin-whitelist" version="1.3.4" />
+    ${enablePushNotification ? '<plugin name="phonegap-plugin-push" version="2.3.0" />' : ''}
+    ${enableCamera ? '<plugin name="cordova-plugin-camera" version="4.1.0" />' : ''}
+    ${enableLocation ? '<plugin name="cordova-plugin-geolocation" version="4.0.2" />' : ''}
+</widget>`;
+  };
+
+  // Generate AndroidManifest.xml
+  const getAndroidManifest = () => {
+    return `<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="${packageName}"
+    android:versionCode="1"
+    android:versionName="${appVersion}">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    ${enableCamera ? '<uses-permission android:name="android.permission.CAMERA" />' : ''}
+    ${enableLocation ? '<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />' : ''}
+    ${enablePushNotification ? '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />' : ''}
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="${appName}"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:usesCleartextTraffic="true">
+        
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
+            android:screenOrientation="${orientation}">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>`;
+  };
+
+  // Generate MainActivity.java for Webview Wrapper
+  const getMainActivityJava = () => {
+    const packageParts = packageName.split('.');
+    const packageDecl = `package ${packageName};`;
+
+    return `${packageDecl}
+
+import android.os.Bundle;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+    private WebView webView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        webView = new WebView(this);
+        setContentView(webView);
+
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(${enableJavaScript});
+        settings.setDomStorageEnabled(${enableOfflineCache});
+        settings.setDatabaseEnabled(true);
+        settings.setAllowFileAccess(true);
+        settings.setUserAgentString("BlinxAPKWrapper/1.0 (Android)");
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+
+        webView.loadUrl("${backendUrl}");
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+}`;
+  };
+
+  // Generate GitHub Action Build Workflow file (.github/workflows/build-apk.yml)
+  const getGithubWorkflowYaml = () => {
+    return `name: Build Android APK (${appName})
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+
+    - name: Build APK with Gradle
+      run: |
+        chmod +x ./gradlew || true
+        ./gradlew assembleDebug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${appName.replace(/\s+/g, '_')}-${appVersion}.apk
+        path: app/build/outputs/apk/debug/app-debug.apk
+`;
+  };
+
+  // Generate Full Zip Project Download
+  const downloadZipProject = async () => {
+    setIsGeneratingZip(true);
+    const zip = new JSZip();
+
+    // Directory structure
+    zip.file("config.xml", getConfigXml());
+    zip.file("AndroidManifest.xml", getAndroidManifest());
+    zip.file("MainActivity.java", getMainActivityJava());
+    zip.file("README.md", `# Project APK Builder: ${appName}\n\nPackage Name: ${packageName}\nBackend URL: ${backendUrl}\nVersion: ${appVersion}\n\nGenerated via Blinx APK Builder Web App.`);
+
+    const githubFolder = zip.folder(".github/workflows");
+    githubFolder.file("build-apk.yml", getGithubWorkflowYaml());
+
+    // Generate blob and trigger download
+    const content = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(content);
+    link.download = `${packageName.replace(/\./g, '_')}_src.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setIsGeneratingZip(false);
+    triggerConfetti();
+  };
+
+  return (
+    <div style={{ paddingBottom: '60px' }}>
+      {/* Top Bar Header */}
+      <header style={{
+        borderBottom: '1px solid var(--border-light)',
+        background: 'rgba(9, 13, 22, 0.8)',
+        backdropFilter: 'blur(12px)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '16px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'var(--shadow-glow)'
+            }}>
+              <Smartphone color="#fff" size={24} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h1 style={{ fontSize: '1.25rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+                  Blinx <span className="glow-text">APK Builder</span>
+                </h1>
+                <span style={{
+                  background: 'rgba(99, 102, 241, 0.15)',
+                  color: 'var(--primary-light)',
+                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  fontSize: '0.7rem',
+                  fontWeight: '700',
+                  padding: '2px 8px',
+                  borderRadius: '12px'
+                }}>
+                  v2.5 PRO
+                </span>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Ubah Website Anda Menjadi Aplikasi Android (APK) Instan & Professional
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              className="btn btn-secondary"
+              onClick={() => setActiveTab(activeTab === 'preview' ? 'config' : 'preview')}
+              style={{ fontSize: '0.88rem' }}
+            >
+              <Smartphone size={16} />
+              {activeTab === 'preview' ? 'Tutup Preview' : 'Live Phone Preview'}
+            </button>
+
+            <button 
+              className="btn btn-primary"
+              onClick={downloadZipProject}
+              disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
+              style={{ opacity: (!isPackageValid || !isUrlValid) ? 0.6 : 1 }}
+            >
+              {isGeneratingZip ? (
+                <>
+                  <RefreshCw size={16} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                  Membuat ZIP...
+                </>
+              ) : (
+                <>
+                  <Download size={16} />
+                  Download Source Code (.ZIP)
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Container */}
+      <main style={{ maxWidth: '1280px', margin: '32px auto 0', padding: '0 24px' }}>
+        
+        {/* Navigation Tabs */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          background: 'rgba(15, 23, 42, 0.6)',
+          padding: '6px',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border-light)',
+          width: 'fit-content',
+          marginBottom: '28px'
+        }}>
+          {[
+            { id: 'config', label: '1. Input & Konfigurasi', icon: Settings2 },
+            { id: 'features', label: '2. Pengaturan APK & Fitur', icon: ShieldCheck },
+            { id: 'code', label: '3. Source Code Manifest', icon: Code2 },
+            { id: 'build', label: '4. Panduan Build APK', icon: Terminal }
+          ].map(tab => {
+            const IconComponent = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.88rem',
+                  fontWeight: '600',
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: isActive ? 'var(--primary)' : 'transparent',
+                  color: isActive ? '#fff' : 'var(--text-muted)',
+                  boxShadow: isActive ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <IconComponent size={16} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Content Layout Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+          
+          {/* LEFT SIDE: Active Tab Content */}
+          <div>
+            {/* TAB 1: Main Form Input */}
+            {activeTab === 'config' && (
+              <div className="glass-panel" style={{ padding: '28px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+                  <Sparkles color="var(--primary-light)" size={22} />
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Informasi Utama Aplikasi</h2>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      Masukkan 3 informasi wajib di bawah ini untuk memulai builder APK Anda.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 1. Nama APK */}
+                <div className="input-group">
+                  <label className="input-label">
+                    <Smartphone size={16} color="var(--primary-light)" />
+                    Nama Aplikasi (App Name) *
+                  </label>
+                  <input
+                    type="text"
+                    className="input-field"
+                    placeholder="Contoh: Blinx Store"
+                    value={appName}
+                    onChange={(e) => setAppName(e.target.value)}
+                  />
+                  <span className="input-hint">Nama yang akan tampil di home screen Android pengguna.</span>
+                </div>
+
+                {/* 2. Nama Paket APK */}
+                <div className="input-group">
+                  <label className="input-label">
+                    <Package size={16} color="var(--accent-cyan)" />
+                    Nama Paket APK (Package ID) *
+                  </label>
+                  <input
+                    type="text"
+                    className="input-field"
+                    placeholder="builder.apk.blinx"
+                    value={packageName}
+                    onChange={(e) => setPackageName(e.target.value)}
+                    style={{
+                      borderColor: isPackageValid ? 'var(--border-light)' : '#ef4444'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="input-hint">
+                      Format unik: com.domain.namaapp atau <code>builder.apk.blinx</code>
+                    </span>
+                    {!isPackageValid && (
+                      <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: '600' }}>
+                        Format Package ID tidak valid!
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Link Website Backend */}
+                <div className="input-group">
+                  <label className="input-label">
+                    <Globe size={16} color="var(--accent-pink)" />
+                    Link Website Backend / Target URL *
+                  </label>
+                  <input
+                    type="url"
+                    className="input-field"
+                    placeholder="https://blinx.app atau https://my-backend.com"
+                    value={backendUrl}
+                    onChange={(e) => setBackendUrl(e.target.value)}
+                    style={{
+                      borderColor: isUrlValid ? 'var(--border-light)' : '#ef4444'
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className="input-hint">
+                      URL website yang akan dimasukkan ke dalam WebView APK.
+                    </span>
+                    {!isUrlValid && (
+                      <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: '600' }}>
+                        Gunakan prefix http:// atau https://
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Additional Branding Inputs */}
+                <div style={{
+                  marginTop: '28px',
+                  paddingTop: '24px',
+                  borderTop: '1px solid var(--border-light)',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '20px'
+                }}>
+                  <div className="input-group">
+                    <label className="input-label">
+                      <Palette size={16} color="var(--accent-amber)" />
+                      Warna Tema (Theme Color)
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <input
+                        type="color"
+                        value={themeColor}
+                        onChange={(e) => setThemeColor(e.target.value)}
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          background: 'none'
+                        }}
+                      />
+                      <input
+                        type="text"
+                        className="input-field"
+                        value={themeColor}
+                        onChange={(e) => setThemeColor(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="input-group">
+                    <label className="input-label">
+                      <Layers size={16} color="var(--accent-green)" />
+                      Versi Aplikasi (Version)
+                    </label>
+                    <input
+                      type="text"
+                      className="input-field"
+                      placeholder="1.0.0"
+                      value={appVersion}
+                      onChange={(e) => setAppVersion(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="input-group" style={{ marginTop: '12px' }}>
+                  <label className="input-label">
+                    <ExternalLink size={16} color="var(--primary-light)" />
+                    URL Logo / Ikon APK (Square PNG)
+                  </label>
+                  <input
+                    type="text"
+                    className="input-field"
+                    placeholder="https://example.com/logo.png"
+                    value={appIcon}
+                    onChange={(e) => setAppIcon(e.target.value)}
+                  />
+                </div>
+
+                {/* Quick Action Button */}
+                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => setActiveTab('features')}
+                  >
+                    Lanjut ke Fitur & Perizinan
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: Fitur & Permission Controls */}
+            {activeTab === 'features' && (
+              <div className="glass-panel" style={{ padding: '28px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+                  <ShieldCheck color="var(--accent-green)" size={22} />
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Pengaturan Perizinan & Hardware</h2>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      Aktifkan hak akses Android dan optimasi WebView sesuai kebutuhan web Anda.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  
+                  {/* Camera Permission */}
+                  <div className="toggle-row">
+                    <div className="toggle-info">
+                      <span className="toggle-title">Izin Kamera (Camera Access)</span>
+                      <span className="toggle-desc">Dibutuhkan jika website menggunakan upload foto / scan QR Code.</span>
+                    </div>
+                    <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={enableCamera} 
+                        onChange={(e) => setEnableCamera(e.target.checked)} 
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+
+                  {/* Location Permission */}
+                  <div className="toggle-row">
+                    <div className="toggle-info">
+                      <span className="toggle-title">Izin Lokasi (GPS Geolocation)</span>
+                      <span className="toggle-desc">Izinkan aplikasi mengakses koordinat GPS pengguna.</span>
+                    </div>
+                    <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={enableLocation} 
+                        onChange={(e) => setEnableLocation(e.target.checked)} 
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+
+                  {/* Push Notifications */}
+                  <div className="toggle-row">
+                    <div className="toggle-info">
+                      <span className="toggle-title">Push Notifications</span>
+                      <span className="toggle-desc">Dukungan notifikasi push via OneSignal / Firebase.</span>
+                    </div>
+                    <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={enablePushNotification} 
+                        onChange={(e) => setEnablePushNotification(e.target.checked)} 
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+
+                  {/* Offline Cache & DOM Storage */}
+                  <div className="toggle-row">
+                    <div className="toggle-info">
+                      <span className="toggle-title">Offline Cache & DOM Storage</span>
+                      <span className="toggle-desc">Simpan cache aset agar website dapat dimuat lebih cepat.</span>
+                    </div>
+                    <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={enableOfflineCache} 
+                        onChange={(e) => setEnableOfflineCache(e.target.checked)} 
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+
+                  {/* Pull To Refresh */}
+                  <div className="toggle-row">
+                    <div className="toggle-info">
+                      <span className="toggle-title">Pull-to-Refresh Gestures</span>
+                      <span className="toggle-desc">Pengguna dapat menarik ke bawah untuk reload halaman web.</span>
+                    </div>
+                    <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={pullToRefresh} 
+                        onChange={(e) => setPullToRefresh(e.target.checked)} 
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+
+                  {/* Hide Status Bar */}
+                  <div className="toggle-row">
+                    <div className="toggle-info">
+                      <span className="toggle-title">Fullscreen Mode (Hide Status Bar)</span>
+                      <span className="toggle-desc">Sembunyikan jam dan status bar bawaan HP untuk tampilan immersive.</span>
+                    </div>
+                    <label className="switch">
+                      <input 
+                        type="checkbox" 
+                        checked={hideStatusBar} 
+                        onChange={(e) => setHideStatusBar(e.target.checked)} 
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Orientasi Layar */}
+                <div style={{ marginTop: '24px' }}>
+                  <label className="input-label" style={{ marginBottom: '10px' }}>
+                    Orientasi Layar (Screen Orientation)
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                    {[
+                      { id: 'portrait', label: 'Portrait (Tegak)' },
+                      { id: 'landscape', label: 'Landscape (Mendatar)' },
+                      { id: 'unspecified', label: 'Auto Rotate' }
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => setOrientation(item.id)}
+                        style={{
+                          padding: '12px',
+                          borderRadius: 'var(--radius-md)',
+                          border: orientation === item.id ? '2px solid var(--primary)' : '1px solid var(--border-light)',
+                          background: orientation === item.id ? 'rgba(99, 102, 241, 0.15)' : 'rgba(10, 15, 26, 0.5)',
+                          color: orientation === item.id ? '#fff' : 'var(--text-muted)',
+                          fontSize: '0.85rem',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '28px', display: 'flex', justifyContent: 'space-between' }}>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => setActiveTab('config')}
+                  >
+                    Kembali
+                  </button>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => setActiveTab('code')}
+                  >
+                    Lihat Source Code Manifest
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: Generated Code Viewer */}
+            {activeTab === 'code' && (
+              <div className="glass-panel" style={{ padding: '28px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Code2 color="var(--accent-cyan)" size={22} />
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Generated Native Files</h2>
+                  </div>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => handleCopy(getAndroidManifest(), 'manifest')}
+                    style={{ fontSize: '0.8rem', padding: '6px 12px' }}
+                  >
+                    {copiedField === 'manifest' ? <Check size={14} color="var(--accent-green)" /> : <Copy size={14} />}
+                    {copiedField === 'manifest' ? 'Tersalin!' : 'Salin Manifest'}
+                  </button>
+                </div>
+
+                {/* Code snippets tab / viewer */}
+                <div style={{ background: '#050811', borderRadius: 'var(--radius-md)', padding: '16px', overflowX: 'auto' }}>
+                  <div style={{ display: 'flex', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--primary-light)', fontWeight: '600', fontFamily: 'var(--font-mono)' }}>
+                      AndroidManifest.xml
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+                      MainActivity.java
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+                      config.xml
+                    </span>
+                  </div>
+                  <pre style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.82rem',
+                    color: '#e2e8f0',
+                    lineHeight: '1.5',
+                    margin: 0
+                  }}>
+                    {getAndroidManifest()}
+                  </pre>
+                </div>
+
+                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between' }}>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => setActiveTab('features')}
+                  >
+                    Kembali
+                  </button>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={() => setActiveTab('build')}
+                  >
+                    Lihat Panduan Build APK
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: Build Instructions & GitHub Action Guide */}
+            {activeTab === 'build' && (
+              <div className="glass-panel" style={{ padding: '28px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                  <Terminal color="var(--accent-pink)" size={22} />
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Cara Compile Jadi File APK (.apk)</h2>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      Pilih metode berikut untuk mengubah source code menjadi file APK siap install.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Option A: Github Actions */}
+                <div style={{
+                  background: 'rgba(99, 102, 241, 0.08)',
+                  border: '1px solid rgba(99, 102, 241, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '20px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <Zap size={18} color="var(--primary-light)" />
+                    <h3 style={{ fontSize: '1rem', fontWeight: '700' }}>Metode 1: Build Otomatis di Cloud (Gratis Tanpa Laptop Canggih)</h3>
+                  </div>
+                  <ol style={{ paddingLeft: '20px', fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: '1.7' }}>
+                    <li>Unduh file proyek dengan mengklik tombol <strong>Download Source Code (.ZIP)</strong>.</li>
+                    <li>Ekstrak dan Upload repository ke <strong>GitHub</strong> Anda.</li>
+                    <li>Masuk ke tab <strong>Actions</strong> di GitHub repository Anda.</li>
+                    <li>Workflow <code>Build Android APK</code> akan otomatis berjalan dan menghasilkan file <strong>app-debug.apk</strong> siap diunduh!</li>
+                  </ol>
+                </div>
+
+                {/* Option B: Local Android Studio / Cordova */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid var(--border-light)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '20px'
+                }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '12px' }}>Metode 2: Build di Computer / Android Studio</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                    Jalankan perintah berikut pada terminal laptop Anda dengan Cordova CLI / Ionic:
+                  </p>
+                  <div style={{ background: '#050811', padding: '14px', borderRadius: '8px', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
+                    <div># 1. Install Cordova CLI global</div>
+                    <div style={{ color: '#fff' }}>npm install -g cordova</div>
+                    <br />
+                    <div># 2. Buat & jalankan build android</div>
+                    <div style={{ color: '#fff' }}>cordova platform add android</div>
+                    <div style={{ color: '#fff' }}>cordova build android --release</div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'center' }}>
+                  <button 
+                    className="btn btn-success"
+                    onClick={downloadZipProject}
+                    style={{ width: '100%', padding: '14px' }}
+                  >
+                    <Download size={18} />
+                    Download Project Zip ({appName})
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT SIDE: Interactive Phone Simulator Mockup */}
+          <div>
+            <div style={{
+              position: 'sticky',
+              top: '100px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                marginBottom: '12px'
+              }}>
+                <span style={{ fontSize: '0.88rem', fontWeight: '700', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Smartphone size={16} /> Live App Preview
+                </span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-green)' }}></span>
+                  WebView Interactive
+                </span>
+              </div>
+
+              {/* Realistic Smartphone Mockup Frame */}
+              <div style={{
+                width: '320px',
+                height: '620px',
+                background: '#090a0f',
+                borderRadius: '40px',
+                border: `8px solid ${themeColor}`,
+                boxShadow: `0 20px 50px rgba(0,0,0,0.8), 0 0 30px ${themeColor}40`,
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                
+                {/* Speaker & Camera Notch */}
+                <div style={{
+                  position: 'absolute',
+                  top: '0',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '120px',
+                  height: '24px',
+                  background: themeColor,
+                  borderBottomLeftRadius: '14px',
+                  borderBottomRightRadius: '14px',
+                  zIndex: 20,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#000' }}></div>
+                  <div style={{ width: '35px', height: '4px', borderRadius: '2px', background: 'rgba(0,0,0,0.5)' }}></div>
+                </div>
+
+                {/* Status Bar */}
+                {!hideStatusBar && (
+                  <div style={{
+                    height: '32px',
+                    background: 'rgba(0,0,0,0.8)',
+                    padding: '8px 18px 0',
+                    display: 'flex',
+                    justify: 'space-between',
+                    alignItems: 'center',
+                    fontSize: '0.7rem',
+                    fontWeight: '600',
+                    color: '#fff',
+                    zIndex: 10
+                  }}>
+                    <span>15:40</span>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <span>5G</span>
+                      <div style={{ width: '16px', height: '8px', border: '1px solid #fff', borderRadius: '2px', padding: '1px' }}>
+                        <div style={{ width: '70%', height: '100%', background: '#fff' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* App Bar / Header inside phone */}
+                <div style={{
+                  background: themeColor,
+                  padding: hideStatusBar ? '32px 14px 10px' : '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  color: '#fff',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img 
+                      src={appIcon} 
+                      alt="Icon" 
+                      style={{ width: '26px', height: '26px', borderRadius: '6px', objectFit: 'cover' }}
+                      onError={(e) => { e.target.src = 'https://via.placeholder.com/50'; }}
+                    />
+                    <span style={{ fontSize: '0.9rem', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '160px' }}>
+                      {appName || 'Nama Aplikasi'}
+                    </span>
+                  </div>
+                  <a 
+                    href={backendUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    style={{ color: '#fff', display: 'flex', opacity: 0.8 }}
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+
+                {/* Simulated WebView Iframe */}
+                <div style={{ flex: 1, background: '#fff', position: 'relative' }}>
+                  {isUrlValid ? (
+                    <iframe
+                      src={backendUrl}
+                      title="APK Preview"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none'
+                      }}
+                      onError={() => setSimulatedUrl('')}
+                    />
+                  ) : (
+                    <div style={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '20px',
+                      textAlign: 'center',
+                      color: '#64748b'
+                    }}>
+                      <AlertCircle size={36} color="var(--accent-amber)" />
+                      <p style={{ fontSize: '0.85rem', marginTop: '10px' }}>
+                        Masukkan URL Website backend yang valid untuk melihat previewWebView.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Android Bottom Navigation Bar */}
+                <div style={{
+                  height: '34px',
+                  background: '#000',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-around'
+                }}>
+                  <div style={{ width: '12px', height: '12px', borderLeft: '2px solid #aaa', borderBottom: '2px solid #aaa', transform: 'rotate(45deg)' }}></div>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid #aaa' }}></div>
+                  <div style={{ width: '12px', height: '12px', border: '2px solid #aaa', borderRadius: '2px' }}></div>
+                </div>
+              </div>
+
+              {/* Package Badge Summary */}
+              <div style={{
+                marginTop: '16px',
+                background: 'rgba(15, 23, 42, 0.7)',
+                padding: '10px 16px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-light)',
+                textAlign: 'center'
+              }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', display: 'block' }}>TARGET PACKAGE</span>
+                <code style={{ fontSize: '0.85rem', color: 'var(--accent-cyan)', fontFamily: 'var(--font-mono)' }}>
+                  {packageName || 'builder.apk.blinx'}
+                </code>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  );
+}
