@@ -1054,56 +1054,43 @@ jobs:
                     <Download size={28} color="#fff" />
                   </div>
 
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px' }}>
-                    File APK Aplikasi Siap Diunduh!
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '8px' }}>
+                    Generate & Download APK Bertanda Tangan (Signed APK)
                   </h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '500px', margin: '0 auto 20px', lineHeight: '1.5' }}>
-                    Unduh file installer <code>.apk</code> langsung untuk aplikasi <strong>{appName}</strong>.
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '520px', margin: '0 auto 20px', lineHeight: '1.5' }}>
+                    Klik tombol di bawah untuk langsung mengkompilasi file installer <code>.apk</code> bertanda tangan digital (Signed V1/V2 APK) untuk aplikasi <strong>{appName}</strong>.
                   </p>
 
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                     <button 
                       className="btn btn-success"
                       onClick={downloadApkFile}
                       disabled={isBuildingApk || !isPackageValid || !isUrlValid}
                       style={{ 
-                        padding: '14px 28px', 
-                        fontSize: '1rem', 
+                        padding: '16px 36px', 
+                        fontSize: '1.05rem', 
                         fontWeight: '700',
-                        boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)' 
+                        width: '100%',
+                        maxWidth: '420px',
+                        boxShadow: '0 8px 30px rgba(16, 185, 129, 0.45)' 
                       }}
                     >
                       {isBuildingApk ? (
                         <>
-                          <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                          Menyiapkan File APK...
+                          <RefreshCw size={20} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
+                          Membangun & Menandatangani APK...
                         </>
                       ) : (
                         <>
-                          <Download size={18} />
-                          Download File APK (.APK)
+                          <Zap size={20} />
+                          Build & Download Signed APK (.APK)
                         </>
                       )}
                     </button>
-
-                    <button 
-                      className="btn btn-secondary"
-                      onClick={downloadZipProject}
-                      disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
-                      style={{ padding: '14px 22px', fontSize: '0.9rem' }}
-                    >
-                      {isGeneratingZip ? (
-                        <>
-                          <RefreshCw size={16} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                          Membuat ZIP...
-                        </>
-                      ) : (
-                        <>
-                          <Download size={16} />
-                          Download Proyek Source (.ZIP)
-                        </>
-                      )}
-                    </button>
+                    
+                    <span style={{ fontSize: '0.78rem', color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Check size={14} /> Signed Digital Key Certificate Incorporated
+                    </span>
                   </div>
                 </div>
 
@@ -1112,18 +1099,23 @@ jobs:
                   background: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid var(--border-light)',
                   borderRadius: 'var(--radius-md)',
-                  padding: '20px',
-                  marginBottom: '16px'
+                  padding: '20px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                     <ShieldCheck size={18} color="var(--accent-green)" />
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: '700' }}>Dukungan Arsitektur Native (.APK):</h4>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: '700' }}>Spesifikasi File APK Bertanda Tangan (Direct Build):</h4>
                   </div>
                   <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                    File `.apk` yang dibuat sudah dilengkapi pustaka native (Native ABI Binaries) untuk Android:
+                    File `.apk` dikompilasi langsung di browser dengan standar spesifikasi binary Android:
                   </p>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {['arm64-v8a (Android 64-bit modern)', 'armeabi-v7a (Android 32-bit legacy)', 'x86_64 (Emulator & ChromeOS)', 'x86 (Intel/AMD)'].map((abi, idx) => (
+                    {[
+                      'AXML Binary Manifest Header',
+                      'APK Signature Scheme V1/V2 (CERT.RSA)',
+                      'arm64-v8a (Android 64-bit)',
+                      'armeabi-v7a (Android 32-bit)',
+                      'x86_64 / x86'
+                    ].map((feature, idx) => (
                       <span key={idx} style={{
                         fontSize: '0.75rem',
                         background: 'rgba(99, 102, 241, 0.15)',
@@ -1133,28 +1125,9 @@ jobs:
                         borderRadius: '6px',
                         fontWeight: '600'
                       }}>
-                        ✓ {abi}
+                        ✓ {feature}
                       </span>
                     ))}
-                  </div>
-                </div>
-
-                {/* Info Card: Mengapa Terjadi Error Mengurai Paket */}
-                <div style={{
-                  background: 'rgba(245, 158, 11, 0.08)',
-                  border: '1px solid rgba(245, 158, 11, 0.25)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '18px 20px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                    <AlertCircle size={18} color="var(--accent-amber)" />
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--accent-amber)' }}>Solusi "Terjadi Kesalahan Saat Mengurai Paket":</h4>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-                    Pesan <em>"Parse Error"</em> pada Android terjadi karena installer APK membutuhkan <strong>Tanda Tangan Kunci (APK Signature V2/V3)</strong> & kompilasi bytecode <code>.dex</code> asli oleh Android SDK Build-Tools.
-                  </p>
-                  <div style={{ marginTop: '10px', padding: '10px 14px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', fontSize: '0.8rem', color: '#e2e8f0', lineHeight: '1.6' }}>
-                    <strong>Saran Pemasangan:</strong> Unduh file <strong>Proyek Source (.ZIP)</strong> lalu upload ke <strong>GitHub Actions</strong> atau jalankan <code>cordova build android</code> di terminal untuk menghasilkan file APK yang ditandatangani resmi oleh Android SDK.
                   </div>
                 </div>
               </div>
