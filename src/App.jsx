@@ -547,6 +547,54 @@ jobs:
                   </div>
                 </div>
 
+                {/* Orientasi Layar */}
+                <div style={{ marginTop: '20px' }}>
+                  <label className="input-label" style={{ marginBottom: '10px' }}>
+                    <Smartphone size={16} color="var(--accent-cyan)" />
+                    Orientasi Layar (Screen Orientation)
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }} className="grid-2col-responsive">
+                    {[
+                      { id: 'portrait', label: 'Portrait (Tegak)', desc: 'Vertikal HP' },
+                      { id: 'landscape', label: 'Landscape (Mendatar)', desc: 'Horizontal / Game' },
+                      { id: 'unspecified', label: 'Auto Rotate', desc: 'Sesuai Putaran HP' }
+                    ].map((item) => {
+                      const isSelected = orientation === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setOrientation(item.id)}
+                          style={{
+                            padding: '12px 10px',
+                            borderRadius: 'var(--radius-md)',
+                            border: isSelected ? '2px solid var(--primary-light)' : '1px solid var(--border-light)',
+                            background: isSelected ? 'rgba(99, 102, 241, 0.2)' : 'rgba(10, 15, 26, 0.6)',
+                            color: isSelected ? '#fff' : 'var(--text-muted)',
+                            fontSize: '0.82rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px',
+                            boxShadow: isSelected ? '0 0 15px rgba(99, 102, 241, 0.3)' : 'none',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                            <span>{item.label}</span>
+                            {isSelected && <Check size={14} color="var(--primary-light)" />}
+                          </div>
+                          <span style={{ fontSize: '0.72rem', color: isSelected ? 'var(--primary-light)' : 'var(--text-dim)', fontWeight: '400' }}>
+                            {item.desc}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Enhanced App Icon Section (Drag & Drop + URL Tabs) */}
                 <div className="input-group" style={{ marginTop: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -888,53 +936,6 @@ jobs:
                       />
                       <span className="slider"></span>
                     </label>
-                  </div>
-                </div>
-
-                {/* Orientasi Layar */}
-                <div style={{ marginTop: '24px' }}>
-                  <label className="input-label" style={{ marginBottom: '10px' }}>
-                    Orientasi Layar (Screen Orientation)
-                  </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }} className="grid-2col-responsive">
-                    {[
-                      { id: 'portrait', label: 'Portrait (Tegak)', desc: 'Penggunaan HP Vertikal' },
-                      { id: 'landscape', label: 'Landscape (Mendatar)', desc: 'Cocok untuk Game / Tablet' },
-                      { id: 'unspecified', label: 'Auto Rotate', desc: 'Mengikuti Putaran HP' }
-                    ].map((item) => {
-                      const isSelected = orientation === item.id;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => setOrientation(item.id)}
-                          style={{
-                            padding: '14px 12px',
-                            borderRadius: 'var(--radius-md)',
-                            border: isSelected ? '2px solid var(--primary-light)' : '1px solid var(--border-light)',
-                            background: isSelected ? 'rgba(99, 102, 241, 0.2)' : 'rgba(10, 15, 26, 0.6)',
-                            color: isSelected ? '#fff' : 'var(--text-muted)',
-                            fontSize: '0.85rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            boxShadow: isSelected ? '0 0 15px rgba(99, 102, 241, 0.3)' : 'none',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                            <span>{item.label}</span>
-                            {isSelected && <Check size={16} color="var(--primary-light)" />}
-                          </div>
-                          <span style={{ fontSize: '0.72rem', color: isSelected ? 'var(--primary-light)' : 'var(--text-dim)', fontWeight: '400' }}>
-                            {item.desc}
-                          </span>
-                        </button>
-                      );
-                    })}
                   </div>
                 </div>
 
