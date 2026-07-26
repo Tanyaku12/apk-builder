@@ -376,7 +376,12 @@ jobs:
         </div>
 
         {/* Content Layout Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: activeTab === 'config' ? '1fr 380px' : '1fr', 
+          gap: '32px', 
+          alignItems: 'start' 
+        }}>
           
           {/* LEFT SIDE: Active Tab Content */}
           <div>
@@ -917,15 +922,16 @@ jobs:
             )}
           </div>
 
-              {/* RIGHT SIDE: Interactive Device Simulator Mockup */}
-              <div>
-                <div style={{
-                  position: 'sticky',
-                  top: '100px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}>
+              {/* RIGHT SIDE: Interactive Device Simulator Mockup (Hanya tampil di Tab 1: config) */}
+              {activeTab === 'config' && (
+                <div>
+                  <div style={{
+                    position: 'sticky',
+                    top: '100px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                  }}>
                   {/* Header & Controls */}
                   <div style={{
                     display: 'flex',
@@ -1156,6 +1162,7 @@ jobs:
 
                 </div>
               </div>
+            )}
 
         </div>
       </main>
