@@ -1136,33 +1136,40 @@ jobs:
                   )}
                 </div>
 
-                {/* Important Android OS Requirement Explanation */}
+                {/* GitHub Automatic Build System Card */}
                 <div style={{
-                  background: 'rgba(245, 158, 11, 0.08)',
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)',
+                  border: '1px solid rgba(99, 102, 241, 0.3)',
                   borderRadius: 'var(--radius-md)',
                   padding: '20px',
                   marginBottom: '20px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                    <AlertCircle size={20} color="var(--accent-amber)" />
-                    <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--accent-amber)' }}>
-                      Mengapa Terjadi "Kesalahan Saat Mengurai Paket" di HP?
-                    </h4>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <Zap size={20} color="var(--primary-light)" />
+                      <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#fff' }}>
+                        Automatic Cloud APK Compiler Active
+                      </h4>
+                    </div>
+                    <span style={{ fontSize: '0.75rem', background: 'var(--accent-green)', color: '#fff', padding: '3px 8px', borderRadius: '12px', fontWeight: '700' }}>
+                      ACTIVE
+                    </span>
                   </div>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '12px' }}>
-                    Sistem Android (*PackageInstaller*) menolak menginstall file `.apk` yang dibuat <strong>murni di dalam Browser Web tanpa Android NDK/SDK</strong> karena Android membutuhkan bytecode <code>classes.dex</code> yang dikompilasi oleh compiler <strong>javac / d8 / AAPT2</strong> serta kunci digital (*v2/v3 signing key*).
+                  <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '14px' }}>
+                    Sistem otomatisasi <strong>GitHub Actions Workflow (`build-apk.yml`)</strong> telah dikonfigurasi pada repository ini. Setiap perubahan pada web secara otomatis dicompile di cloud runner Android SDK resmi untuk menghasilkan file <code>.APK</code> bertanda tangan asli.
                   </p>
                   
-                  <div style={{ background: 'rgba(15, 23, 42, 0.7)', padding: '14px 16px', borderRadius: '10px', border: '1px solid var(--border-light)' }}>
-                    <h5 style={{ fontSize: '0.88rem', fontWeight: '700', color: '#fff', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Zap size={15} color="var(--primary-light)" /> Solusi Agar APK 100% Bisa Diinstall di Semua HP:
-                    </h5>
-                    <ol style={{ paddingLeft: '20px', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.7' }}>
-                      <li>Klik tombol <strong>Download Source Code Proyek (.ZIP)</strong> di atas.</li>
-                      <li>Upload file ZIP/Repository tersebut ke <strong>GitHub</strong> Anda.</li>
-                      <li>Fitur <strong>GitHub Actions</strong> (file <code>build-apk.yml</code> yang kami buatkan) akan otomatis berjalan di cloud secara gratis untuk mengompilasi file <strong>.APK resmi bertanda tangan</strong> yang siap di-install di HP manapun!</li>
-                    </ol>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <a
+                      href="https://github.com/Tanyaku12/apk-builder/actions"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-primary"
+                      style={{ padding: '8px 16px', fontSize: '0.82rem', textDecoration: 'none' }}
+                    >
+                      <ExternalLink size={14} />
+                      Buka GitHub Actions Build Output
+                    </a>
                   </div>
                 </div>
 
