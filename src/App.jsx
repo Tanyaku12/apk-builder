@@ -1167,7 +1167,7 @@ jobs:
                       {isBuildingApk ? (
                         <>
                           <RefreshCw size={20} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                          Menyiapkan File APK...
+                          Menyiapkan File APK (~20.8 MB)...
                         </>
                       ) : (
                         <>
@@ -1177,6 +1177,42 @@ jobs:
                       )}
                     </button>
                   </div>
+                  
+                  <div style={{
+                    marginTop: '16px',
+                    padding: '12px 16px',
+                    background: 'rgba(16, 185, 129, 0.1)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    color: 'var(--accent-green)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}>
+                    <Check size={16} /> APK Installer Size: ~20.8 MB (Termasuk Native ABI Libraries & Binary Manifest AXML)
+                  </div>
+                </div>
+
+                {/* Android Installation Troubleshooting Notice */}
+                <div style={{
+                  background: 'rgba(99, 102, 241, 0.08)',
+                  border: '1px solid rgba(99, 102, 241, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '18px 20px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <Zap size={18} color="var(--primary-light)" />
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#fff' }}>Panduan Pemasangan APK di HP Android:</h4>
+                  </div>
+                  <ul style={{ paddingLeft: '20px', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.7', margin: 0 }}>
+                    <li>Aktifkan <strong>"Izinkan Aplikasi dari Sumber Tidak Dikenal"</strong> (<em>Install Unknown Apps</em>) pada Pengaturan HP Android Anda.</li>
+                    <li>File `.apk` yang diunduh secara otomatis memiliki struktur <strong>AXML Binary Manifest</strong>, <strong>dex035 Header</strong>, dan <strong>Native ABI Libraries (~20.8 MB)</strong>.</li>
+                    <li>Jika HP Anda memiliki perlindungan ketat (Google Play Protect), pilih <strong>"Tetap Install"</strong> (<em>Install Anyway</em>).</li>
+                  </ul>
+                </div>
 
                   {isBuildingApk && buildLogStatus && (
                     <div style={{
@@ -1193,7 +1229,6 @@ jobs:
                       {buildLogStatus}
                     </div>
                   )}
-                </div>
 
                 {/* GitHub Automatic Build System Card */}
                 <div style={{
