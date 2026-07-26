@@ -22,7 +22,10 @@ import {
   FileText,
   AlertCircle,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Trash2,
+  RotateCcw,
+  Link as LinkIcon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import JSZip from 'jszip';
@@ -36,8 +39,10 @@ export default function App() {
   // Extended Customization State
   const [appVersion, setAppVersion] = useState('1.0.0');
   const [themeColor, setThemeColor] = useState('#6366f1');
-  const [orientation, setOrientation] = useState('portrait'); // portrait, landscape, auto
-  const [appIcon, setAppIcon] = useState('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80');
+  const defaultAppIcon = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80';
+  const [appIcon, setAppIcon] = useState(defaultAppIcon);
+  const [iconMode, setIconMode] = useState('upload'); // 'upload' | 'url'
+  const [isDragging, setIsDragging] = useState(false);
 
   // Permissions & Features Switches
   const [enableCamera, setEnableCamera] = useState(true);
@@ -522,79 +527,197 @@ jobs:
                   </div>
                 </div>
 
-                {/* Enhanced App Icon Section */}
-                <div className="input-group" style={{ marginTop: '16px' }}>
-                  <label className="input-label">
-                    <ImageIcon size={16} color="var(--primary-light)" />
-                    Ikon Aplikasi (App Icon)
-                  </label>
-                  
-                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '6px' }}>
-                    {/* Live Icon Thumbnail Preview */}
-                    <div style={{
-                      width: '64px',
-                      height: '64px',
-                      borderRadius: '16px',
-                      background: 'rgba(15, 23, 42, 0.8)',
-                      border: '2px dashed var(--primary-light)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      overflow: 'hidden',
-                      flexShrink: 0,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                      position: 'relative'
-                    }}>
-                      <img 
-                        src={appIcon} 
-                        alt="App Icon Preview" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80'; }}
-                      />
+                {/* Enhanced App Icon Section (Drag & Drop + URL Tabs) */}
+                <div className="input-group" style={{ marginTop: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <label className="input-label" style={{ marginBottom: 0 }}>
+                      <ImageIcon size={16} color="var(--primary-light)" />
+                      Ikon Aplikasi (App Icon)
+                    </label>
+                    
+                    {/* Tab Switcher: Upload vs URL */}
+                    <div style={{ display: 'flex', gap: '4px', background: 'rgba(15, 23, 42, 0.8)', padding: '3px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                      <button
+                        type="button"
+                        onClick={() => setIconMode('upload')}
+                        style={{
+                          background: iconMode === 'upload' ? 'var(--primary)' : 'transparent',
+                          color: iconMode === 'upload' ? '#fff' : 'var(--text-muted)',
+                          border: 'none',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Upload size={13} />
+                        Upload File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIconMode('url')}
+                        style={{
+                          background: iconMode === 'url' ? 'var(--primary)' : 'transparent',
+                          color: iconMode === 'url' ? '#fff' : 'var(--text-muted)',
+                          border: 'none',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <LinkIcon size={13} />
+                        URL / Link
+                      </button>
                     </div>
+                  </div>
 
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {/* URL Field + File Upload Button */}
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                  {/* TAB 1: DRAG & DROP UPLOAD AREA */}
+                  {iconMode === 'upload' ? (
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'stretch' }}>
+                      {/* Big Interactive Preview Thumbnail */}
+                      <div style={{
+                        width: '84px',
+                        height: '84px',
+                        borderRadius: '20px',
+                        background: 'rgba(15, 23, 42, 0.9)',
+                        border: '2px solid var(--primary-light)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                        boxShadow: '0 8px 20px rgba(0,0,0,0.4)',
+                        position: 'relative'
+                      }}>
+                        <img 
+                          src={appIcon} 
+                          alt="App Icon Preview" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => { e.target.src = defaultAppIcon; }}
+                        />
+                      </div>
+
+                      {/* Dropzone Container */}
+                      <div
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          setIsDragging(false);
+                          const file = e.dataTransfer.files[0];
+                          if (file && file.type.startsWith('image/')) {
+                            const reader = new FileReader();
+                            reader.onload = (uploadEvent) => {
+                              setAppIcon(uploadEvent.target.result);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        style={{
+                          flex: 1,
+                          border: `2px dashed ${isDragging ? 'var(--primary-light)' : 'rgba(255,255,255,0.15)'}`,
+                          borderRadius: 'var(--radius-md)',
+                          background: isDragging ? 'rgba(99, 102, 241, 0.12)' : 'rgba(15, 23, 42, 0.4)',
+                          padding: '16px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textAlign: 'center',
+                          transition: 'all 0.25s ease',
+                          position: 'relative'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                          <Upload size={18} color="var(--primary-light)" />
+                          <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                            Seret & Lepas Gambar ke Sini
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                          atau pilih file dari perangkat (PNG / JPG persegi)
+                        </p>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <label className="btn btn-secondary" style={{ padding: '6px 14px', fontSize: '0.78rem', cursor: 'pointer' }}>
+                            Pilih File Gambar
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              style={{ display: 'none' }}
+                              onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = (uploadEvent) => {
+                                    setAppIcon(uploadEvent.target.result);
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </label>
+
+                          {appIcon !== defaultAppIcon && (
+                            <button
+                              type="button"
+                              onClick={() => setAppIcon(defaultAppIcon)}
+                              className="btn btn-secondary"
+                              style={{ padding: '6px 10px', fontSize: '0.78rem', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                              title="Reset Ikon Default"
+                            >
+                              <RotateCcw size={14} />
+                              Reset
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* TAB 2: INPUT URL & PRESET OPTIONS */
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '12px',
+                          background: 'rgba(15, 23, 42, 0.8)',
+                          border: '1px solid var(--border-light)',
+                          overflow: 'hidden',
+                          flexShrink: 0
+                        }}>
+                          <img 
+                            src={appIcon} 
+                            alt="Preview" 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => { e.target.src = defaultAppIcon; }}
+                          />
+                        </div>
                         <input
                           type="text"
                           className="input-field"
-                          placeholder="https://example.com/logo.png atau upload file"
+                          placeholder="https://domain.com/path-to-icon.png"
                           value={appIcon}
                           onChange={(e) => setAppIcon(e.target.value)}
                           style={{ flex: 1 }}
                         />
-                        <label 
-                          className="btn btn-secondary"
-                          style={{ cursor: 'pointer', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                        >
-                          <Upload size={16} />
-                          Upload
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            style={{ display: 'none' }}
-                            onChange={(e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (uploadEvent) => {
-                                  setAppIcon(uploadEvent.target.result);
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                          />
-                        </label>
                       </div>
 
                       {/* Quick Presets */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Preset Ikon:</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Preset Pilihan:</span>
                         {[
                           'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
                           'https://images.unsplash.com/photo-1614680376593-902f749f7edc?w=200&auto=format&fit=crop&q=80',
-                          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
                           'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=200&auto=format&fit=crop&q=80'
                         ].map((url, idx) => (
                           <button
@@ -602,9 +725,9 @@ jobs:
                             type="button"
                             onClick={() => setAppIcon(url)}
                             style={{
-                              width: '24px',
-                              height: '24px',
-                              borderRadius: '6px',
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '8px',
                               border: appIcon === url ? '2px solid var(--primary-light)' : '1px solid var(--border-light)',
                               padding: 0,
                               overflow: 'hidden',
@@ -616,8 +739,11 @@ jobs:
                         ))}
                       </div>
                     </div>
-                  </div>
-                  <span className="input-hint" style={{ marginTop: '6px' }}>Format disarankan: PNG / JPG Persegi (1:1), minimal 512x512px. Bisa upload langsung dari file lokal.</span>
+                  )}
+
+                  <span className="input-hint" style={{ marginTop: '8px' }}>
+                    Ukuran ideal ikon adalah 512x512 piksel (Format PNG / JPG persegi). Ikon ini akan tampil pada launcher Android.
+                  </span>
                 </div>
 
                 {/* Quick Action Button */}
