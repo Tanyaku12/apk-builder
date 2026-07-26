@@ -1075,32 +1075,25 @@ jobs:
                   </p>
 
                   <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', width: '100%' }}>
-                    <button 
+                    <a
+                      href="https://github.com/Tanyaku12/apk-builder/actions"
+                      target="_blank"
+                      rel="noreferrer"
                       className="btn btn-success"
-                      onClick={downloadApkFile}
-                      disabled={isBuildingApk || !isPackageValid || !isUrlValid}
                       style={{ 
-                        padding: '14px 24px', 
-                        fontSize: '0.95rem', 
+                        padding: '14px 28px', 
+                        fontSize: '1rem', 
                         fontWeight: '700',
+                        textDecoration: 'none',
                         boxShadow: '0 6px 25px rgba(16, 185, 129, 0.4)' 
                       }}
                     >
-                      {isBuildingApk ? (
-                        <>
-                          <RefreshCw size={18} className="animated-pulse" style={{ animation: 'spin 1s linear infinite' }} />
-                          Proses Build...
-                        </>
-                      ) : (
-                        <>
-                          <Zap size={18} />
-                          Download APK Instan (.APK)
-                        </>
-                      )}
-                    </button>
+                      <Download size={20} />
+                      Download Release Signed APK (.APK)
+                    </a>
 
                     <button 
-                      className="btn btn-primary"
+                      className="btn btn-secondary"
                       onClick={downloadZipProject}
                       disabled={isGeneratingZip || !isPackageValid || !isUrlValid}
                       style={{ padding: '14px 24px', fontSize: '0.95rem', fontWeight: '700' }}
