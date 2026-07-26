@@ -342,17 +342,6 @@ jobs:
               </p>
             </div>
           </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button 
-              className="btn btn-secondary"
-              onClick={() => setActiveTab(activeTab === 'preview' ? 'config' : 'preview')}
-              style={{ fontSize: '0.88rem' }}
-            >
-              <Smartphone size={16} />
-              {activeTab === 'preview' ? 'Tutup Preview' : 'Live Phone Preview'}
-            </button>
-          </div>
         </div>
       </header>
 
